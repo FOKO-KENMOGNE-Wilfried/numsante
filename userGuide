@@ -1,0 +1,166 @@
+🔐 Fonctionnement détaillé de chaque feature de l'API
+1. Authentification Professionnel (Login classique)
+Endpoint : POST /auth/login-professionnel
+
+json
+{
+  "identifiantPro": "dr_mballa",
+  "motDePasse": "passer123"
+}
+L'utilisateur envoie son identifiant professionnel et mot de passe
+
+Le système vérifie les credentials dans la table personnel_medical
+
+Si valide → génération d'un token JWT contenant le rôle (medecin, infirmier, etc.)
+
+Le token est valable 24h et doit être envoyé dans le header Authorization: Bearer <token> pour toutes les requêtes suivantes
+
+2. Enregistrement Biométrique
+Endpoint : POST /auth/enregistrer-biometrie
+
+json
+{
+  "idUtilisateur": "uuid-du-patient-ou-id-pro",
+  "typeUtilisateur": "patient",
+  "clePubliqueAppareil": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A..."
+}
+Stocke la clé publique générée par le smartphone dans la base de données
+
+Cette clé servira plus tard à vérifier les signatures biométriques
+
+Dans une app réelle, cette clé est générée par le Secure Enclave (iOS) ou Android Keystore
+
+3. Login Biométrique (SIMULÉ)
+Endpoint : POST /auth/login-biometrique
+
+json
+{
+  "idUtilisateur": "uuid-du-patient",
+  "signatureDefi": "signature_cryptographique_du_defi"
+}
+
+4. Scan QR Code
+Endpoint : POST /admission/scan-carte
+
+json
+{
+  "qrCodeToken": "TOKEN_UNIQUE_CHIFFRE_EXTRAIT_DU_QR",
+  "idHopital": 1
+}
+L'agent d'accueil scanne le QR code du patient
+
+Le système cherche le token dans la table cartes_numeriques
+
+Si trouvé → retourne les infos du patient (nom, prénom, groupe sanguin, etc.)
+
+Log l'action dans logs_tracabilite
+
+5. Création d'un Passage Médical
+Endpoint : POST /admission/creer-passage
+
+json
+{
+  "idPatient": "8f3b9c2a-1234-4bc3-a716-446655440000",
+  "idHopital": 1,
+  "motifVisite": "Consultation Cardiologie"
+}
+Crée un nouveau dossier de visite pour un patient
+
+Stocke : date d'admission, hôpital, médecin créateur, motif
+
+Statut initial : "en_cours"
+
+Log automatique dans la table de traçabilité
+
+6. Historique Médical
+Endpoint : GET /patients/{idPatient}/historique
+
+Récupère TOUS les passages médicaux du patient, triés par date
+
+Inclut les données de tous les hôpitaux connectés
+
+Retourne pour chaque passage :
+
+Motif, constantes vitales, diagnostic, prescription, statut
+
+Nom de l'hôpital où a eu lieu la visite
+
+Log l'action de consultation
+
+7. Constantes Vitales
+Endpoint : PUT /passages/{idPassage}/constantes
+
+json
+{
+  "constantesVitales": {
+    "tension": "12/8",
+    "temperature": "37.2",
+    "poids": "74kg",
+    "frequence_cardiaque": "72"
+  }
+}
+L'infirmier met à jour les constantes du patient
+
+Stocké en JSON dans PostgreSQL (type JSONB)
+
+Flexible : peut contenir n'importe quelle mesure
+
+Log automatique
+
+8. Consultation Médicale
+Endpoint : PUT /passages/{idPassage}/consultation
+
+json
+{
+  "diagnostic": "Bronchite aiguë bactérienne",
+  "prescriptionOrdonnance": "Amoxicilline 1g (3x/jour pendant 5 jours)",
+  "cloturerPassage": true
+}
+Le médecin ajoute son diagnostic et sa prescription
+
+Peut clôturer le passage (statut : "termine")
+
+Log automatique
+
+9. Examens de Laboratoire
+Endpoint : POST /laboratoire/ajouter-examen
+
+json
+{
+  "idPassage": "9e2a4b8c-5678-4df1-bc23-112233445566",
+  "typeExamen": "Hémogramme (NFS)",
+  "resultats": "Globules blancs : 11000 /mm3 (Élevés)"
+}
+Le laborantin ajoute des résultats d'analyse
+
+Lié à un passage médical spécifique
+
+Log automatique
+
+🔍 Traçabilité (Logs)
+Chaque action sensible est automatiquement enregistrée dans logs_tracabilite :
+
+Qui a fait l'action (ID du personnel)
+
+Quoi (action effectuée : LECTURE_DOSSIER, MODIF_DIAGNOSTIC, etc.)
+
+Quand (horodatage automatique)
+
+Sur quel patient/dossier
+
+Depuis quelle IP
+
+🎯 Résumé du flux typique
+Patient arrive à l'hôpital → Agent scanne son QR code
+
+Création admission → Nouveau passage médical créé
+
+Infirmier → Prend les constantes vitales
+
+Médecin → Consulte l'historique, pose diagnostic, prescrit
+
+Laboratoire → Ajoute résultats d'analyses
+
+Clôture → Le passage est marqué comme terminé
+
+Traçabilité → Chaque étape est loggée pour audit
