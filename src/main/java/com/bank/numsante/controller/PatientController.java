@@ -2,6 +2,8 @@ package com.bank.numsante.controller;
 
 import com.bank.numsante.dto.EnregistrementPatientRequest;
 import com.bank.numsante.dto.HistoriquePassageDto;
+import com.bank.numsante.dto.PageResponse;
+import com.bank.numsante.dto.UpdatePatientRequest;
 import com.bank.numsante.entity.Patient;
 import com.bank.numsante.exception.ResourceNotFoundException;
 import com.bank.numsante.repository.PatientRepository;
@@ -57,5 +59,47 @@ public class PatientController {
     public ResponseEntity<List<HistoriquePassageDto>> getHistorique(@PathVariable UUID idPatient,
                                                                     Authentication authentication) {
         return ResponseEntity.ok(patientService.getHistorique(idPatient, authentication.getName()));
+    }
+
+    @GetMapping
+    @Operation(summary = "Liste de tous les patients avec pagination et recherche")
+    public ResponseEntity<PageResponse<Patient>> getAllPatients(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(patientService.getAllPatients(page, size, search));
+    }
+
+    @GetMapping("/{idPatient}")
+    @Operation(summary = "Détails d'un patient")
+    public ResponseEntity<Patient> getPatientById(@PathVariable UUID idPatient) {
+        return ResponseEntity.ok(patientService.getPatientById(idPatient));
+    }
+
+    @PutMapping("/{idPatient}")
+    @Operation(summary = "Modifier les informations d'un patient")
+    public ResponseEntity<Patient> updatePatient(@PathVariable UUID idPatient,
+                                                 @Valid @RequestBody UpdatePatientRequest request) {
+        return ResponseEntity.ok(patientService.updatePatient(idPatient, request));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Rechercher un patient par nom")
+    public ResponseEntity<List<Patient>> searchPatients(@RequestParam String query) {
+        return ResponseEntity.ok(patientService.searchPatients(query));
+    }
+
+    @PostMapping("/{idPatient}/renouveler-carte")
+    @Operation(summary = "Renouveler la carte QR d'un patient")
+    public ResponseEntity<Map<String, Object>> renouvelerCarte(@PathVariable UUID idPatient) {
+        return ResponseEntity.ok(patientService.renouvelerCarte(idPatient));
+    }
+
+    @PostMapping("/{idPatient}/suspendre-carte")
+    @Operation(summary = "Suspendre ou marquer comme perdue la carte QR")
+    public ResponseEntity<Map<String, Object>> suspendreCarte(
+            @PathVariable UUID idPatient,
+            @RequestParam(defaultValue = "suspendu") String motif) {
+        return ResponseEntity.ok(patientService.suspendreCarte(idPatient, motif));
     }
 }
