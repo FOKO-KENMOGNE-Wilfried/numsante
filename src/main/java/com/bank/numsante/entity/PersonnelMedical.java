@@ -1,5 +1,7 @@
 package com.bank.numsante.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +14,7 @@ public class PersonnelMedical {
 
     @ManyToOne
     @JoinColumn(name = "id_hopital")
+    @JsonIgnoreProperties("personnels")
     private Hopital hopital;
 
     @Column(nullable = false)
@@ -21,12 +24,13 @@ public class PersonnelMedical {
     private String prenom;
 
     @Column(nullable = false)
-    private String role; // medecin, infirmier, accueil, laborantin, pharmacien, admin
+    private String role;
 
     @Column(unique = true, nullable = false)
     private String identifiantPro;
 
     @Column(nullable = false)
+    @JsonIgnore  // 👈 Ne jamais sérialiser le mot de passe
     private String motDePasseHash;
 
     @Column(columnDefinition = "TEXT")

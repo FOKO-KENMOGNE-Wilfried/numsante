@@ -1,8 +1,8 @@
 package com.bank.numsante.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
 
 @Entity
@@ -20,5 +20,6 @@ public class Hopital {
     private String codeUnique;
 
     @OneToMany(mappedBy = "hopital")
+    @JsonIgnore
     private List<PersonnelMedical> personnels;
 }

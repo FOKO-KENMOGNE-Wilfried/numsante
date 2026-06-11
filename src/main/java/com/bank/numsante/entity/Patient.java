@@ -1,5 +1,7 @@
 package com.bank.numsante.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +21,7 @@ public class Patient {
 
     @Column(nullable = false)
     private String nom;
+
     @Column(nullable = false)
     private String prenom;
 
@@ -37,8 +40,10 @@ public class Patient {
     private LocalDateTime creeLe;
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore
     private CarteNumerique carteNumerique;
 
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("patient")
     private List<PassageMedical> passages;
 }

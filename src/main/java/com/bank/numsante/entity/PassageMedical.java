@@ -1,5 +1,6 @@
 package com.bank.numsante.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,14 +21,17 @@ public class PassageMedical {
 
     @ManyToOne
     @JoinColumn(name = "id_patient", nullable = false)
+    @JsonIgnoreProperties({"passages", "carteNumerique"})
     private Patient patient;
 
     @ManyToOne
     @JoinColumn(name = "id_hopital", nullable = false)
+    @JsonIgnoreProperties("personnels")
     private Hopital hopital;
 
     @ManyToOne
     @JoinColumn(name = "id_createur", nullable = false)
+    @JsonIgnoreProperties({"hopital", "passages"})
     private PersonnelMedical createur;
 
     @CreationTimestamp
@@ -48,5 +52,5 @@ public class PassageMedical {
     private String prescriptionOrdonnance;
 
     @Column(nullable = false)
-    private String statutPassage = "en_cours"; // en_cours, termine
+    private String statutPassage = "en_cours";
 }
