@@ -25,9 +25,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints publics
+                        // Public
                         .requestMatchers(
                                 "/auth/login-professionnel",
+                                "/auth/login-patient",
+                                "/auth/register-patient",
                                 "/auth/login-biometrique",
                                 "/auth/enregistrer-biometrie",
                                 "/swagger-ui/**",
@@ -37,36 +39,41 @@ public class SecurityConfig {
                                 "/actuator/health"
                         ).permitAll()
 
-                        // ADMIN - Gestion complète du personnel et hôpitaux
+                        // Admin
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/hopitaux/**").hasRole("ADMIN")
-
-                        // ADMIN - CRUD personnel
                         .requestMatchers(HttpMethod.POST, "/personnel/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/personnel/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/personnel/**").hasRole("ADMIN")
+
+                        // Lecture personnel (médecins, admin)
                         .requestMatchers(HttpMethod.GET, "/personnel/**").hasAnyRole("ADMIN", "MEDECIN")
 
-                        // ACCUEIL - Scan QR et création admission
+                        // Accueil
                         .requestMatchers("/admission/scan-carte").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER")
                         .requestMatchers("/admission/creer-passage").hasRole("ACCUEIL")
 
-                        // MEDECIN & INFIRMIER - Constantes vitales
+                        // Constantes
                         .requestMatchers(HttpMethod.PUT, "/passages/*/constantes").hasAnyRole("INFIRMIER", "MEDECIN")
 
-                        // MEDECIN uniquement - Consultation
+                        // Consultation (médecin)
                         .requestMatchers(HttpMethod.PUT, "/passages/*/consultation").hasRole("MEDECIN")
 
-                        // LABORANTIN - Examens
+                        // Laboratoire
                         .requestMatchers("/laboratoire/**").hasRole("LABORANTIN")
 
-                        // PHARMACIEN - Validation prescriptions
+                        // Pharmacie
                         .requestMatchers("/pharmacie/**").hasRole("PHARMACIEN")
 
-                        // Lecture historique - plusieurs rôles
+                        // Historique patient (lui-même, médecin, infirmier)
                         .requestMatchers(HttpMethod.GET, "/patients/*/historique").hasAnyRole("MEDECIN", "INFIRMIER", "PATIENT")
 
-                        // Rapports accessibles aux admins et medecins
+                        // Gestion patients (CRUD admin/medecin)
+                        .requestMatchers(HttpMethod.POST, "/patients/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/patients/**").hasRole("MEDECIN")
+                        .requestMatchers(HttpMethod.GET, "/patients/**").hasAnyRole("ADMIN", "MEDECIN", "ACCUEIL", "INFIRMIER", "PATIENT")
+
+                        // Rapports
                         .requestMatchers("/rapports/**").hasAnyRole("ADMIN", "MEDECIN")
 
                         .anyRequest().authenticated()

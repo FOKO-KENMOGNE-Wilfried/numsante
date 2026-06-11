@@ -3,6 +3,7 @@ package com.bank.numsante.service;
 import com.bank.numsante.config.JwtTokenProvider;
 import com.bank.numsante.dto.BiometricLoginRequest;
 import com.bank.numsante.dto.BiometricRegistrationRequest;
+import com.bank.numsante.dto.LoginPatientRequest;
 import com.bank.numsante.dto.LoginRequest;
 import com.bank.numsante.entity.Patient;
 import com.bank.numsante.entity.PersonnelMedical;
@@ -20,6 +21,17 @@ public class AuthService {
     private final PatientRepository patientRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+
+    public String loginPatient(LoginPatientRequest request) {
+        Patient patient = patientRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Email ou mot de passe incorrect"));
+
+        if (!passwordEncoder.matches(request.getMotDePasse(), patient.getMotDePasseHash())) {
+            throw new RuntimeException("Email ou mot de passe incorrect");
+        }
+
+        return jwtTokenProvider.generateToken(patient.getEmail(), "PATIENT");
+    }
 
     public String loginProfessionnel(LoginRequest request) {
         PersonnelMedical personnel = personnelRepo.findByIdentifiantPro(request.getIdentifiantPro())

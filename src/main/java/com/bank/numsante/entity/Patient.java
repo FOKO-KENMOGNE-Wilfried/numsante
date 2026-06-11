@@ -1,12 +1,11 @@
 package com.bank.numsante.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,22 +27,30 @@ public class Patient {
     @Column(name = "date_naissance", nullable = false)
     private LocalDate dateNaissance;
 
+    @Column(length = 1)
     private Character genre;
+
+    @Column(name = "groupe_sanguin", length = 3)
     private String groupeSanguin;
+
     private String telephone;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(name = "mot_de_passe_hash", nullable = false)
+    private String motDePasseHash;
 
     @Column(name = "cle_publique_biometrique", columnDefinition = "TEXT")
     private String clePubliqueBiometrique;
 
     @CreationTimestamp
-    @Column(name = "cree_le")
+    @Column(name = "cree_le", updatable = false)
     private LocalDateTime creeLe;
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
-    @JsonIgnore
     private CarteNumerique carteNumerique;
 
-    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("patient")
-    private List<PassageMedical> passages;
+    @OneToMany(mappedBy = "patient")
+    private List<PassageMedical> passages = new ArrayList<>();
 }

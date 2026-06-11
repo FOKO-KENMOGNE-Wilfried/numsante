@@ -1,27 +1,27 @@
 package com.bank.numsante.config;
 
 import com.bank.numsante.security.CustomUserDetailsService;
+import com.bank.numsante.security.PatientDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
-    private final CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService; // pour le personnel
+    private final PatientDetailsService patientDetailsService; // pour les patients
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,11 +31,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
             String username = tokenProvider.getUsernameFromToken(token);
             String role = tokenProvider.getRoleFromToken(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            UserDetails userDetails;
+            if ("PATIENT".equalsIgnoreCase(role)) {
+                userDetails = patientDetailsService.loadUserByUsername(username);
+            } else {
+                userDetails = userDetailsService.loadUserByUsername(username);
+            }
+
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            userDetails, null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())));
+                            userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
