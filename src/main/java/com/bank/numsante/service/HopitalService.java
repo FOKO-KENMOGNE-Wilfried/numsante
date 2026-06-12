@@ -43,6 +43,14 @@ public class HopitalService {
     @Transactional
     public Hopital updateHopital(Long id, CreateHopitalRequest request) {
         Hopital hopital = getHopitalById(id);
+
+        // Vérifier l'unicité du codeUnique si celui-ci est modifié
+        if (!hopital.getCodeUnique().equals(request.getCodeUnique())) {
+            if (hopitalRepository.existsByCodeUnique(request.getCodeUnique())) {
+                throw new RuntimeException("Un hôpital avec ce code unique existe déjà");
+            }
+        }
+
         hopital.setNom(request.getNom());
         hopital.setAdresse(request.getAdresse());
         hopital.setCodeUnique(request.getCodeUnique());

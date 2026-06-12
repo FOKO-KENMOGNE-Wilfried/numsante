@@ -9,6 +9,8 @@ import com.bank.numsante.repository.PassageMedicalRepository;
 import com.bank.numsante.repository.PersonnelMedicalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,5 +38,9 @@ public class LaboratoireService {
         logService.logAction(laborantin.getIdPersonnel(),
                 passage.getPatient().getIdPatient(),
                 "AJOUT_EXAMEN", passage.getIdPassage());
+    }
+
+    public List<ExamenLaboratoire> getExamensByPassage(UUID idPassage) {
+        return examenRepo.findByPassage_IdPassage(idPassage);
     }
 }

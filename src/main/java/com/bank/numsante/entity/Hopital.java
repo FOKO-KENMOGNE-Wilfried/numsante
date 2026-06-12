@@ -3,6 +3,8 @@ package com.bank.numsante.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -18,6 +20,10 @@ public class Hopital {
 
     @Column(unique = true, nullable = false)
     private String codeUnique;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime dateCreation;
 
     @OneToMany(mappedBy = "hopital")
     @JsonIgnore

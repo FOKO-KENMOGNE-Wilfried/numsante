@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "personnel_medical")
@@ -37,4 +40,11 @@ public class PersonnelMedical {
     private String clePubliqueAppareil;
 
     private Boolean estActif = true;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime dateCreation;
+
+    @UpdateTimestamp
+    private LocalDateTime dateModification;
 }

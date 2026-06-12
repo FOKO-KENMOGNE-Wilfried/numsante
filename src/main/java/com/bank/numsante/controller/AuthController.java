@@ -23,8 +23,8 @@ public class AuthController {
     @Operation(summary = "Connexion professionnel (identifiant/mot de passe)")
     @PostMapping("/login-professionnel")
     public ResponseEntity<Map<String, String>> loginProfessionnel(@Valid @RequestBody LoginRequest request) {
-        String token = authService.loginProfessionnel(request);
-        return ResponseEntity.ok(Map.of("token", token));
+        Map<String, String> response = authService.loginProfessionnel(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Enregistrement patient (création du compte)")
@@ -37,8 +37,8 @@ public class AuthController {
     @Operation(summary = "Connexion patient (email/mot de passe)")
     @PostMapping("/login-patient")
     public ResponseEntity<Map<String, String>> loginPatient(@Valid @RequestBody LoginPatientRequest request) {
-        String token = authService.loginPatient(request);
-        return ResponseEntity.ok(Map.of("token", token));
+        Map<String, String> response = authService.loginPatient(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Enregistrement de la biométrie (clé publique)")

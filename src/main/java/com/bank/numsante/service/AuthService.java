@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -22,7 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public String loginPatient(LoginPatientRequest request) {
+    public Map<String, String> loginPatient(LoginPatientRequest request) {
         Patient patient = patientRepo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email ou mot de passe incorrect"));
 
@@ -30,16 +33,44 @@ public class AuthService {
             throw new RuntimeException("Email ou mot de passe incorrect");
         }
 
-        return jwtTokenProvider.generateToken(patient.getEmail(), "PATIENT");
+        String token = jwtTokenProvider.generateToken(patient.getEmail(), "PATIENT");
+
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("idPatient", patient.getIdPatient().toString());
+        response.put("nom", patient.getNom());
+        response.put("prenom", patient.getPrenom());
+        response.put("email", patient.getEmail());
+        response.put("role", "patient");
+
+        return response;
     }
 
-    public String loginProfessionnel(LoginRequest request) {
+    public Map<String, String> loginProfessionnel(LoginRequest request) {
         PersonnelMedical personnel = personnelRepo.findByIdentifiantPro(request.getIdentifiantPro())
                 .orElseThrow(() -> new RuntimeException("Identifiants invalides"));
         if (!passwordEncoder.matches(request.getMotDePasse(), personnel.getMotDePasseHash())) {
             throw new RuntimeException("Identifiants invalides");
         }
-        return jwtTokenProvider.generateToken(personnel.getIdentifiantPro(), personnel.getRole());
+
+        String token = jwtTokenProvider.generateToken(personnel.getIdentifiantPro(), personnel.getRole());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("idPersonnel", String.valueOf(personnel.getIdPersonnel()));
+        response.put("nom", personnel.getNom());
+        response.put("prenom", personnel.getPrenom());
+        response.put("role", personnel.getRole().toLowerCase());
+        response.put("identifiantPro", personnel.getIdentifiantPro());
+
+        // Informations de l'hôpital (si disponible)
+        if (personnel.getHopital() != null) {
+            response.put("idHopital", String.valueOf(personnel.getHopital().getIdHopital()));
+            response.put("hopitalNom", personnel.getHopital().getNom());
+            response.put("hopitalCode", personnel.getHopital().getCodeUnique());
+        }
+
+        return response;
     }
 
     public void enregistrerBiometrie(BiometricRegistrationRequest request) {

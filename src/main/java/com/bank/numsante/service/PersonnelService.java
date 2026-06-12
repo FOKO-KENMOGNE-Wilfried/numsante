@@ -112,10 +112,6 @@ public class PersonnelService {
     }
 
     public List<PersonnelMedical> searchPersonnel(String query) {
-        return personnelRepo.findAll().stream()
-                .filter(p -> p.getNom().toLowerCase().contains(query.toLowerCase()) ||
-                        p.getPrenom().toLowerCase().contains(query.toLowerCase()) ||
-                        p.getIdentifiantPro().toLowerCase().contains(query.toLowerCase()))
-                .toList();
+        return personnelRepo.search(query);
     }
 }

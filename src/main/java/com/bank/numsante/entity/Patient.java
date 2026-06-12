@@ -35,7 +35,7 @@ public class Patient {
 
     private String telephone;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "mot_de_passe_hash", nullable = false)

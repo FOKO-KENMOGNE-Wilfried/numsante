@@ -41,6 +41,12 @@ public class PassageController {
         return ResponseEntity.ok(Map.of("message", "Dossier de consultation enregistré et archivé"));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Récupérer un passage médical par son ID")
+    public ResponseEntity<PassageMedical> getPassageById(@PathVariable UUID id) {
+        return ResponseEntity.ok(passageService.getPassageById(id));
+    }
+
     @GetMapping("/hopital/{idHopital}")
     @Operation(summary = "Passages par hôpital avec pagination")
     public ResponseEntity<PageResponse<PassageMedical>> getPassagesByHopital(

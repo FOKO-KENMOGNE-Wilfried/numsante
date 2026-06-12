@@ -6,9 +6,11 @@ import lombok.Data;
 @Data
 public class CreatePersonnelRequest {
     @NotBlank
+    @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")
     private String nom;
 
     @NotBlank
+    @Size(max = 100, message = "Le prénom ne doit pas dépasser 100 caractères")
     private String prenom;
 
     @NotBlank
@@ -17,6 +19,7 @@ public class CreatePersonnelRequest {
     private String role;
 
     @NotBlank
+    @Pattern(regexp = "^[a-z0-9_]+$", message = "Identifiant invalide (minuscules, chiffres, underscore uniquement)")
     private String identifiantPro;
 
     @NotBlank

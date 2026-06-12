@@ -42,6 +42,11 @@ public class PassageService {
         return passageRepo.findByHopital_IdHopitalAndStatutPassage(idHopital, "EN_COURS");
     }
 
+    public PassageMedical getPassageById(UUID idPassage) {
+        return passageRepo.findById(idPassage)
+                .orElseThrow(() -> new RuntimeException("Passage introuvable avec l'ID: " + idPassage));
+    }
+
     @Transactional
     public void annulerPassage(UUID idPassage, String username) {
         PassageMedical passage = passageRepo.findById(idPassage)

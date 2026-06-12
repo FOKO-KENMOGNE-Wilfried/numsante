@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -75,6 +77,13 @@ public class SecurityConfig {
 
                         // Rapports
                         .requestMatchers("/rapports/**").hasAnyRole("ADMIN", "MEDECIN")
+
+                        // Logs et traçabilité
+                        .requestMatchers(HttpMethod.GET, "/logs").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/logs/patient/**").hasAnyRole("ADMIN", "MEDECIN")
+                        .requestMatchers(HttpMethod.GET, "/logs/passage/**").hasAnyRole("ADMIN", "MEDECIN", "INFIRMIER")
+                        .requestMatchers(HttpMethod.GET, "/logs/personnel/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/logs/search").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

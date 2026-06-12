@@ -27,9 +27,13 @@ public class JwtTokenProvider {
     public String generateToken(String username, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
+
+        // Ajouter le préfixe ROLE_ si pas déjà présent
+        String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase();
+
         return Jwts.builder()
                 .subject(username)
-                .claim("role", role)
+                .claim("role", roleWithPrefix)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)

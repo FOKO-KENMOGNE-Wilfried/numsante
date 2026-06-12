@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -24,6 +25,7 @@ public class PersonnelController {
 
     @PostMapping
     @Operation(summary = "Créer un nouveau personnel médical (ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PersonnelMedical> creerPersonnel(@Valid @RequestBody CreatePersonnelRequest request,
                                                            Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -32,6 +34,7 @@ public class PersonnelController {
 
     @GetMapping
     @Operation(summary = "Liste tout le personnel avec pagination")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDECIN')")
     public ResponseEntity<PageResponse<PersonnelMedical>> getAllPersonnel(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -41,18 +44,21 @@ public class PersonnelController {
 
     @GetMapping("/role/{role}")
     @Operation(summary = "Personnel par rôle (medecin, infirmier, accueil, laborantin, pharmacien)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDECIN', 'ACCUEIL')")
     public ResponseEntity<List<PersonnelMedical>> getPersonnelByRole(@PathVariable String role) {
         return ResponseEntity.ok(personnelService.getPersonnelByRole(role));
     }
 
     @GetMapping("/hopital/{idHopital}")
     @Operation(summary = "Personnel par hôpital")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDECIN', 'ACCUEIL')")
     public ResponseEntity<List<PersonnelMedical>> getPersonnelByHopital(@PathVariable Long idHopital) {
         return ResponseEntity.ok(personnelService.getPersonnelByHopital(idHopital));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Modifier un personnel (ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PersonnelMedical> updatePersonnel(@PathVariable Long id,
                                                             @Valid @RequestBody UpdatePersonnelRequest request) {
         return ResponseEntity.ok(personnelService.updatePersonnel(id, request));
@@ -60,6 +66,7 @@ public class PersonnelController {
 
     @PutMapping("/reset-password")
     @Operation(summary = "Réinitialiser le mot de passe (ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         personnelService.resetPassword(request);
         return ResponseEntity.ok(Map.of("message", "Mot de passe réinitialisé avec succès"));
@@ -67,6 +74,7 @@ public class PersonnelController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Désactiver un personnel (ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePersonnel(@PathVariable Long id) {
         personnelService.deletePersonnel(id);
         return ResponseEntity.noContent().build();
@@ -74,6 +82,7 @@ public class PersonnelController {
 
     @GetMapping("/search")
     @Operation(summary = "Rechercher un personnel par nom, prénom ou matricule")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDECIN')")
     public ResponseEntity<List<PersonnelMedical>> searchPersonnel(@RequestParam String query) {
         return ResponseEntity.ok(personnelService.searchPersonnel(query));
     }
