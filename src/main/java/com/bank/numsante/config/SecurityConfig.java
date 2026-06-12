@@ -52,14 +52,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/personnel/**").hasAnyRole("ADMIN", "MEDECIN")
 
                         // Accueil
-                        .requestMatchers("/admission/scan-carte").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER")
-                        .requestMatchers("/admission/creer-passage").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER")
+                        .requestMatchers("/admission/scan-carte").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER", "ADMIN")
+                        .requestMatchers("/admission/creer-passage").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER", "ADMIN")
 
                         // Constantes
-                        .requestMatchers(HttpMethod.PUT, "/passages/*/constantes").hasAnyRole("INFIRMIER", "MEDECIN")
+                        .requestMatchers(HttpMethod.PUT, "/passages/*/constantes").hasAnyRole("INFIRMIER", "MEDECIN", "ADMIN")
 
                         // Consultation (médecin)
-                        .requestMatchers(HttpMethod.PUT, "/passages/*/consultation").hasRole("MEDECIN")
+                        .requestMatchers(HttpMethod.PUT, "/passages/*/consultation").hasAnyRole("MEDECIN", "ADMIN")
 
                         // Laboratoire
                         .requestMatchers("/laboratoire/**").hasRole("LABORANTIN")
@@ -68,11 +68,11 @@ public class SecurityConfig {
                         .requestMatchers("/pharmacie/**").hasRole("PHARMACIEN")
 
                         // Historique patient (lui-même, médecin, infirmier)
-                        .requestMatchers(HttpMethod.GET, "/patients/*/historique").hasAnyRole("MEDECIN", "INFIRMIER", "PATIENT")
+                        .requestMatchers(HttpMethod.GET, "/patients/*/historique").hasAnyRole("MEDECIN", "INFIRMIER", "PATIENT", "ADMIN")
 
                         // Gestion patients (CRUD admin/medecin)
                         .requestMatchers(HttpMethod.POST, "/patients/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/patients/**").hasRole("MEDECIN")
+                        .requestMatchers(HttpMethod.PUT, "/patients/**").hasAnyRole("MEDECIN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/patients/**").hasAnyRole("ADMIN", "MEDECIN", "ACCUEIL", "INFIRMIER", "PHARMACIEN", "LABORANTIN", "PATIENT")
 
                         // Rapports

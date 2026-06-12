@@ -48,7 +48,7 @@ public class PassageService {
     }
 
     @Transactional
-    public void annulerPassage(UUID idPassage, String username) {
+    public PassageMedical annulerPassage(UUID idPassage, String username) {
         PassageMedical passage = passageRepo.findById(idPassage)
                 .orElseThrow(() -> new RuntimeException("Passage introuvable"));
         passage.setStatutPassage("annule");
@@ -58,10 +58,11 @@ public class PassageService {
         logService.logAction(personnel != null ? personnel.getIdPersonnel() : null,
                 passage.getPatient().getIdPatient(),
                 "ANNULATION_PASSAGE", passage.getIdPassage());
+        return passage;
     }
 
     @Transactional
-    public void updateConstantes(UUID idPassage, ConstantesVitalesRequest request, String username) {
+    public PassageMedical updateConstantes(UUID idPassage, ConstantesVitalesRequest request, String username) {
         PassageMedical passage = passageRepo.findById(idPassage)
                 .orElseThrow(() -> new RuntimeException("Passage introuvable"));
         passage.setConstantesVitales(request.getConstantesVitales());
@@ -71,10 +72,11 @@ public class PassageService {
         logService.logAction(personnel != null ? personnel.getIdPersonnel() : null,
                 passage.getPatient().getIdPatient(),
                 "MAJ_CONSTANTES", passage.getIdPassage());
+        return passage;
     }
 
     @Transactional
-    public void ajouterConsultation(UUID idPassage, ConsultationRequest request, String username) {
+    public PassageMedical ajouterConsultation(UUID idPassage, ConsultationRequest request, String username) {
         PassageMedical passage = passageRepo.findById(idPassage)
                 .orElseThrow(() -> new RuntimeException("Passage introuvable"));
         if (request.getDiagnostic() != null) passage.setDiagnostic(request.getDiagnostic());
@@ -87,5 +89,6 @@ public class PassageService {
         logService.logAction(personnel != null ? personnel.getIdPersonnel() : null,
                 passage.getPatient().getIdPatient(),
                 "CONSULTATION", passage.getIdPassage());
+        return passage;
     }
 }

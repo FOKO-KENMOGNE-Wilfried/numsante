@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -25,20 +24,24 @@ public class PassageController {
 
     @Operation(summary = "Mettre à jour les constantes vitales d’un passage")
     @PutMapping("/{idPassage}/constantes")
-    public ResponseEntity<Map<String, String>> updateConstantes(@PathVariable UUID idPassage,
-                                                                @Valid @RequestBody ConstantesVitalesRequest request,
-                                                                Authentication authentication) {
-        passageService.updateConstantes(idPassage, request, authentication.getName());
-        return ResponseEntity.ok(Map.of("message", "Constantes vitales mises à jour avec succès"));
+    public ResponseEntity<PassageMedical> updateConstantes(
+            @PathVariable UUID idPassage,
+            @Valid @RequestBody ConstantesVitalesRequest request,
+            Authentication authentication) {
+
+        PassageMedical updatedPassage = passageService.updateConstantes(idPassage, request, authentication.getName());
+        return ResponseEntity.ok(updatedPassage);
     }
 
     @Operation(summary = "Ajouter diagnostic / prescription et éventuellement clôturer le passage")
     @PutMapping("/{idPassage}/consultation")
-    public ResponseEntity<Map<String, String>> ajouterConsultation(@PathVariable UUID idPassage,
-                                                                   @Valid @RequestBody ConsultationRequest request,
-                                                                   Authentication authentication) {
-        passageService.ajouterConsultation(idPassage, request, authentication.getName());
-        return ResponseEntity.ok(Map.of("message", "Dossier de consultation enregistré et archivé"));
+    public ResponseEntity<PassageMedical> ajouterConsultation(
+            @PathVariable UUID idPassage,
+            @Valid @RequestBody ConsultationRequest request,
+            Authentication authentication) {
+
+        PassageMedical updatedPassage = passageService.ajouterConsultation(idPassage, request, authentication.getName());
+        return ResponseEntity.ok(updatedPassage);
     }
 
     @GetMapping("/{id}")
@@ -64,9 +67,8 @@ public class PassageController {
 
     @DeleteMapping("/{idPassage}")
     @Operation(summary = "Annuler un passage")
-    public ResponseEntity<Map<String, String>> annulerPassage(@PathVariable UUID idPassage,
-                                                              Authentication authentication) {
-        passageService.annulerPassage(idPassage, authentication.getName());
-        return ResponseEntity.ok(Map.of("message", "Passage annulé avec succès"));
+    public ResponseEntity<PassageMedical> annulerPassage(@PathVariable UUID idPassage, Authentication authentication) {
+        PassageMedical annulledPassage = passageService.annulerPassage(idPassage, authentication.getName());
+        return ResponseEntity.ok(annulledPassage);
     }
 }
