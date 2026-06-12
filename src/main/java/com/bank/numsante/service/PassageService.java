@@ -39,7 +39,7 @@ public class PassageService {
     }
 
     public List<PassageMedical> getPassagesEnCours(Long idHopital) {
-        return passageRepo.findByHopital_IdHopitalAndStatutPassage(idHopital, "EN_COURS");
+        return passageRepo.findByHopital_IdHopitalAndStatutPassage(idHopital, "en_cours");
     }
 
     public PassageMedical getPassageById(UUID idPassage) {

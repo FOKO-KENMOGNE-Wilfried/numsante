@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String role = tokenProvider.getRoleFromToken(token);
 
             UserDetails userDetails;
-            if ("PATIENT".equalsIgnoreCase(role)) {
+            if ("ROLE_PATIENT".equalsIgnoreCase(role)) {
                 userDetails = patientDetailsService.loadUserByUsername(username);
             } else {
                 userDetails = userDetailsService.loadUserByUsername(username);

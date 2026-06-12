@@ -53,7 +53,7 @@ public class SecurityConfig {
 
                         // Accueil
                         .requestMatchers("/admission/scan-carte").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER")
-                        .requestMatchers("/admission/creer-passage").hasRole("ACCUEIL")
+                        .requestMatchers("/admission/creer-passage").hasAnyRole("ACCUEIL", "MEDECIN", "INFIRMIER")
 
                         // Constantes
                         .requestMatchers(HttpMethod.PUT, "/passages/*/constantes").hasAnyRole("INFIRMIER", "MEDECIN")
@@ -73,7 +73,7 @@ public class SecurityConfig {
                         // Gestion patients (CRUD admin/medecin)
                         .requestMatchers(HttpMethod.POST, "/patients/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/patients/**").hasRole("MEDECIN")
-                        .requestMatchers(HttpMethod.GET, "/patients/**").hasAnyRole("ADMIN", "MEDECIN", "ACCUEIL", "INFIRMIER", "PATIENT")
+                        .requestMatchers(HttpMethod.GET, "/patients/**").hasAnyRole("ADMIN", "MEDECIN", "ACCUEIL", "INFIRMIER", "PHARMACIEN", "LABORANTIN", "PATIENT")
 
                         // Rapports
                         .requestMatchers("/rapports/**").hasAnyRole("ADMIN", "MEDECIN")
@@ -84,6 +84,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/logs/passage/**").hasAnyRole("ADMIN", "MEDECIN", "INFIRMIER")
                         .requestMatchers(HttpMethod.GET, "/logs/personnel/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/logs/search").hasRole("ADMIN")
+
+                        // Notifications (patients peuvent consulter leurs propres notifications)
+                        .requestMatchers(HttpMethod.GET, "/notifications/patient/**").hasRole("PATIENT")
+                        .requestMatchers(HttpMethod.PUT, "/notifications/*/marquer-lue").hasRole("PATIENT")
+                        .requestMatchers(HttpMethod.PUT, "/notifications/patient/*/marquer-toutes-lues").hasRole("PATIENT")
+                        .requestMatchers(HttpMethod.DELETE, "/notifications/**").hasRole("PATIENT")
 
                         .anyRequest().authenticated()
                 )
