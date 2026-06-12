@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/pharmacie/**").hasRole("PHARMACIEN")
 
                         // Historique patient (lui-même, médecin, infirmier)
-                        .requestMatchers(HttpMethod.GET, "/patients/*/historique").hasAnyRole("MEDECIN", "INFIRMIER", "PATIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/patients/*/historique").hasAnyRole("MEDECIN", "INFIRMIER", "PATIENT", "ADMIN", "LABORANTIN")
 
                         // Gestion patients (CRUD admin/medecin)
                         .requestMatchers(HttpMethod.POST, "/patients/**").hasRole("ADMIN")
